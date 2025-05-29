@@ -1,0 +1,60 @@
+@startuml Form State Management Architecture
+skinparam componentStyle rectangle
+
+package "Recoil State" {
+  [fieldValueState\natomFamily] as FieldAtoms
+  [formRendererState\nselector] as FormDataSelector
+  [formConfigState] as FormConfig
+  [visibleSectionsState] as VisibleSections
+  [currentSectionState] as CurrentSection
+}
+
+package "Form Components" {
+  [FormRenderer] as Renderer
+  [FormSection] as Section
+  [Field Components] as Fields
+}
+
+package "Utilities" {
+  [structuredDataBuilder] as Builder
+  [formValidation] as Validator
+}
+
+' Field level relationships
+Fields --> FieldAtoms : "read/write\nindividual fields"
+FieldAtoms --> FormDataSelector : "aggregated into\ncomplete form data"
+
+' Section level relationships
+FormConfig --> Renderer : "defines form structure"
+VisibleSections --> Renderer : "filters sections\nbased on conditions"
+CurrentSection --> Renderer : "determines currently\nactive section"
+
+' Form data flow
+FormDataSelector --> Validator : "validates\nform data"
+FormDataSelector --> Builder : "transforms into\nstructured output"
+
+' Component relationships
+Renderer --> Section : "renders current section"
+Section --> Fields : "renders field components"
+
+' Validation and output
+Builder --> [Final Structured\nOutput] : "produces"
+Renderer --> [Final Structured\nOutput] : "submits"
+
+note right of FieldAtoms
+  Stores individual field values
+  with granular reactivity
+end note
+
+note right of FormDataSelector
+  Aggregates all field values
+  into flat form data structure
+end note
+
+note right of Builder
+  Transforms flat form data
+  into nested structure 
+  based on integral sections
+end note
+
+@enduml

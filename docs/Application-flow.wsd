@@ -1,0 +1,232 @@
+@startuml React SPA Architecture Overview
+package "React SPA" {
+  [App Component]
+  [Router]
+  
+  package "Core" {
+    [Authentication]
+    [Error Handling]
+    [Logging]
+    [HTTP Client]
+  }
+  
+  package "Shared" {
+    [UI Components]
+    [Utilities]
+    [Constants]
+  }
+  
+  package "Features" {
+    [Feature 1]
+    [Feature 2]
+    [Feature 3]
+  }
+  
+  package "State Management" {
+    [Recoil Atoms]
+    [Recoil Selectors]
+    [React Context]
+    [Local State]
+  }
+}
+
+[App Component] --> [Router]
+[Router] --> [Feature 1]
+[Router] --> [Feature 2]
+[Router] --> [Feature 3]
+[Feature 1] --> [State Management]
+[Feature 2] --> [State Management]
+[Feature 3] --> [State Management]
+[Feature 1] --> [Shared]
+[Feature 2] --> [Shared]
+[Feature 3] --> [Shared]
+[Feature 1] --> [Core]
+[Feature 2] --> [Core]
+[Feature 3] --> [Core]
+@enduml
+
+@startuml Folder Structure
+artifact "src/" {
+  artifact "assets/" {
+    artifact "images/"
+    artifact "styles/"
+  }
+  
+  artifact "core/" {
+    artifact "auth/"
+    artifact "http/"
+    artifact "error-handling/"
+    artifact "logging/"
+    artifact "guards/"
+  }
+  
+  artifact "shared/" {
+    artifact "components/"
+    artifact "hooks/"
+    artifact "utils/"
+    artifact "constants/"
+    artifact "types/"
+  }
+  
+  artifact "features/" {
+    artifact "feature1/" {
+      artifact "components/"
+      artifact "hooks/"
+      artifact "state/"
+      artifact "api/"
+      artifact "types/"
+    }
+    artifact "feature2/"
+    artifact "feature3/"
+  }
+  
+  artifact "recoil/" {
+    artifact "atoms/"
+    artifact "selectors/"
+    artifact "hooks/"
+  }
+  
+  artifact "App.tsx"
+  artifact "index.tsx"
+}
+@enduml
+
+@startuml State Management Decision Flow
+start
+if (Is the state shared across multiple components?) then (yes)
+  if (Is the state shared across the entire app or across features?) then (entire app)
+    :Use Recoil atoms and selectors;
+  else (across features)
+    if (Is it complex state with derived values?) then (yes)
+      :Use Recoil within feature scope;
+    else (simple state)
+      :Use React Context;
+    endif
+  endif
+else (no)
+  if (Is component complex with multiple sub-components?) then (yes)
+    :Consider useState or useReducer with props drilling;
+  else (simple component)
+    :Use useState;
+  endif
+endif
+stop
+@enduml
+
+@startuml HTTP Request Flow with Axios
+participant "Component" as C
+participant "API Service" as A
+participant "Axios Instance" as Axios
+participant "Request Interceptor" as RI
+participant "Response Interceptor" as RespI
+participant "Error Handler" as EH
+participant "Backend API" as API
+
+C -> A: Call API method
+A -> Axios: Make HTTP request
+Axios -> RI: Process request
+RI -> API: Add headers, auth tokens
+API --> RespI: Return response
+RespI -> A: Process response
+alt Successful response
+  A --> C: Return data
+else Error response
+  RespI -> EH: Handle error
+  EH -> A: Transform error
+  A --> C: Return error or throw
+end
+@enduml
+
+@startuml React vs Angular Architecture
+package "React Application" {
+  [Component-Based]
+  [Virtual DOM]
+  [JSX/TSX]
+  [Unidirectional Data Flow]
+  [External Libraries]
+  [Manual Integration]
+}
+
+package "Angular Application" {
+  [Component-Based]
+  [Real DOM]
+  [Templates]
+  [Two-way Data Binding]
+  [Integrated Solutions]
+  [CLI and Tooling]
+}
+
+note right of [React Application]
+  - Library, not framework
+  - More flexibility
+  - More decision-making
+  - Lighter weight
+  - Community-driven ecosystem
+endnote
+
+note right of [Angular Application]
+  - Full-featured framework
+  - Opinionated structure
+  - More built-in features
+  - Higher learning curve
+  - Google-maintained
+endnote
+@enduml
+
+@startuml Recoil State Management
+package "Recoil State" {
+  [RecoilRoot]
+  
+  package "Atoms" {
+    [UserAtom]
+    [SettingsAtom]
+    [FeatureSpecificAtom]
+  }
+  
+  package "Selectors" {
+    [DerivedDataSelector]
+    [FilteredDataSelector]
+    [ComputedValueSelector]
+  }
+  
+  package "Components" {
+    [ComponentA]
+    [ComponentB]
+    [ComponentC]
+  }
+}
+
+[RecoilRoot] --> [Atoms]
+[Atoms] --> [Selectors]
+[ComponentA] --> [UserAtom]
+[ComponentB] --> [SettingsAtom]
+[ComponentC] --> [DerivedDataSelector]
+[ComponentA] --> [ComputedValueSelector]
+@enduml
+
+@startuml Component Communication
+participant "Parent" as P
+participant "Child 1" as C1
+participant "Child 2" as C2
+participant "Recoil Store" as RS
+
+== Props Based Communication ==
+P -> C1: Pass props
+P -> C2: Pass props
+C1 -> P: Callback function
+C2 -> P: Callback function
+
+== Recoil Based Communication ==
+P -> RS: useRecoilState()
+C1 -> RS: useRecoilState()
+C2 -> RS: useRecoilState()
+RS -> P: State update
+RS -> C1: State update
+RS -> C2: State update
+
+== Mixed Approach ==
+P -> RS: useRecoilState() for global state
+P -> C1: Pass props for local state
+C1 -> RS: useRecoilValue() for read-only global state
+C2 -> RS: useSetRecoilState() for updating global state
+@enduml

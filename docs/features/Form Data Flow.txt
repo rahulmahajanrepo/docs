@@ -1,0 +1,52 @@
+@startuml Form Data Flow
+actor User
+participant "Field Component" as Field
+participant "fieldValueState\n(atomFamily)" as Atom
+participant "formRendererState\n(selector)" as FormData
+participant "structuredDataBuilder" as Builder
+participant "Server API" as Server
+
+User -> Field: Input value
+activate Field
+
+Field -> Atom: Update field atom with new value
+activate Atom
+Atom --> Field: Confirm update
+deactivate Atom
+
+Field --> User: Visual feedback
+deactivate Field
+
+note right of Atom: Only components using this\nspecific field re-render
+
+group Form Submission
+  User -> Field: Submit form
+  activate Field
+  
+  Field -> FormData: Request current form data
+  activate FormData
+  
+  FormData -> Atom: Read all field values
+  activate Atom
+  Atom --> FormData: Return values
+  deactivate Atom
+  
+  FormData --> Field: Provide flat form data
+  deactivate FormData
+  
+  Field -> Builder: Transform to structured output
+  activate Builder
+  
+  Builder --> Field: Return structured data
+  deactivate Builder
+  
+  Field -> Server: Submit structured data
+  activate Server
+  Server --> Field: Confirm submission
+  deactivate Server
+  
+  Field --> User: Confirmation message
+  deactivate Field
+end
+
+@enduml
